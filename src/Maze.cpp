@@ -35,8 +35,90 @@ more parameters .
 
 #include<stdlib.h>
 
+void Path_Recursion(int *a, int i, int j, int end_i, int end_j, int last_i, int last_j, int rows, int columns, int flagi, int flagj, int *res);
 
 int path_exists(int *maze, int rows, int columns, int x1, int y1, int x2, int y2)
 {
-	return 1;
+	if (rows < 0 || columns < 0 || x1 < 0 || x1 >= rows || x2 < 0 || x2 >= rows || y1 < 0 || y1 >= columns || y2 < 0 || y2 >= columns)	//invalid size
+	{
+		return 0;
+	}
+
+	if (maze[(x1*columns) + y1] == 0 || maze[(x2*columns) + y2] == 0)
+	{
+		return 0;
+	}
+
+	int res;
+	Path_Recursion(maze, x1, y1, x2, y2, -1, -1, rows, columns, 0, 0, &res);
+	return res;
+}
+
+void Path_Recursion(int *a, int i, int j, int end_i, int end_j, int last_i, int last_j, int rows, int columns, int flagi, int flagj, int *res)
+{
+	int present_i = i;
+	int present_j = j;
+	if (i == end_i && j == end_j)
+	{
+		*res = 1;	return;
+	}
+	if (flagi == 1)
+	{
+		flagi = 0;
+		if ((j + 1) >= columns || (j + 1) < columns && a[(i*columns) + (j + 1)] == 0)
+		{
+			if ((i - 1) < 0 || (i - 1) >= 0 && a[((i - 1)*columns) + j] == 0)
+			{
+				if ((j - 1) < 0 || (j - 1) >= 0 && a[(i * columns) + (j - 1)] == 0)
+				{
+					i++;
+				}
+				else{ j--;  flagj = 1; }
+			}
+			else{ i--;  flagi = 1; }
+		}
+		else{ j++; }
+	}
+	else if (flagj == 1)
+	{
+		flagj = 0;
+		if ((i + 1) >= rows || (i + 1) < rows && a[((i + 1)*columns) + j] == 0)
+		{
+			if ((i - 1) < 0 || (i - 1) >= 0 && a[((i - 1)*columns) + j] == 0)
+			{
+				if ((j - 1) < 0 || (j - 1) >= 0 && a[(i*columns) + (j - 1)] == 0)
+				{
+					j++;
+				}
+				else{ j--;  flagj = 1; }
+			}
+			else{ i--;  flagi = 1; }
+		}
+		else{ i++; }
+	}
+	else if (flagi == 0 && flagj == 0)
+	{
+		if ((i + 1) >= rows || (i + 1) < rows && a[((i + 1)*columns) + j] == 0)
+		{
+			if ((j + 1) >= columns || (j + 1) < columns && a[(i*columns) + (j + 1)] == 0)
+			{
+				if ((i - 1) < 0 || (i - 1) >= 0 && a[((i - 1)*columns) + j] == 0)
+				{
+					if ((j - 1) < 0 || (j - 1) >= 0 && a[(i*columns) + (j - 1)] == 0)
+					{
+						*res = 0;	return;
+					}
+					else{ j--;  flagj = 1; }
+				}
+				else{ i--;  flagi = 1; }
+			}
+			else{ j++; }
+		}
+		else{ i++; }
+	}
+	if (i == last_i && j == last_j)
+	{
+		a[(present_i*columns) + present_j] = 0;
+	}
+	Path_Recursion(a, i, j, end_i, end_j, present_i, present_j, rows, columns, flagi, flagj, res);
 }
