@@ -43,6 +43,70 @@ P.S: The Above Problem is just a modified version of a popular BackTracking prob
 */
 
 #include "stdafx.h"
-int solve_nsnipers(int *battlefield, int n){
+
+int FindSolution(int *battlefield, int column, int n);
+bool isSafe(int *board, int row, int col, int n);
+
+int solve_nsnipers(int *battlefield, int n)
+{
+	if (battlefield == NULL)
+		return 0;
+
+	if (FindSolution(battlefield, 0, n) == 0)
+	{
+		return  0;
+	}
+
+	return 1;
+}
+
+int FindSolution(int *battlefield, int column, int n)
+{
+	if (column >= n)
+	{
+		return 1;
+	}
+	for (int row_index = 0; row_index < n; row_index++)
+	{
+		if (isSafe(battlefield, row_index, column, n) == true)
+		{
+			*((battlefield + row_index*n) + column) = 1;
+
+			if (FindSolution(battlefield, column + 1, n) == true)
+				return  1;
+
+			*((battlefield + row_index*n) + column) = 0;
+		}
+	}
 	return 0;
+}
+
+bool isSafe(int *board, int row, int col, int n)
+{
+	int i, j;
+	//row check
+	for (i = 0; i < n; i++)
+	{
+		if (*((board + row*n) + i) == 1)
+			return false;
+	}
+	//column check
+	for (i = 0; i < n; i++)
+	{
+		if (*((board + i*n) + col) == 1)
+			return false;
+	}
+	//diagonal checks
+
+	for (i = row, j = col; i >= 0 && j >= 0; i--, j--)
+	{
+		if (*((board + i*n) + j) == 1)
+			return false;
+	}
+	for (i = row, j = col; j >= 0 && i < n; i++, j--)
+	{
+		if (*((board + i*n) + j) == 1)
+			return false;
+	}
+	return true;
 }
